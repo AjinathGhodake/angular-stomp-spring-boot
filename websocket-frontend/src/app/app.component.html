@@ -1,16 +1,21 @@
 <div class="toolbar" role="banner">
- <span>Welcome</span>
+  <span>Welcome</span>
 </div>
 
 <div class="content" role="main">
- 
-  <input class="form-control" type="text" placeholder="message" [(ngModel)]="input">
+  <input
+    class="form-control"
+    type="text"
+    placeholder="message"
+    [(ngModel)]="input"
+  />
   <button class="btn btn-success" (click)="sendMessage()">Send</button>
+  <button class="btn btn-success" (click)="sendMessageToUser()">
+    Send to user
+  </button>
   <div class="content">
     <div *ngFor="let msg of messageService.msg">
-      {{msg}}
+      {{ msg }}
     </div>
   </div>
 </div>
-
-

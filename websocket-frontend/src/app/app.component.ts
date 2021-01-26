@@ -16,4 +16,10 @@ export class AppComponent {
       this.input = '';
     }
   }
+  sendMessageToUser() {
+    if (this.input) {
+      this.messageService.sendMessageToUser(this.input);
+      this.input = '';
+    }
+  }
 }

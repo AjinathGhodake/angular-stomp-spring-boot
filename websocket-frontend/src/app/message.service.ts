@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 declare var SockJS;
 declare var Stomp;
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MessageService {
-
   constructor() {
     this.initializeWebSocketConnection();
   }
@@ -16,17 +15,27 @@ export class MessageService {
     const ws = new SockJS(serverUrl);
     this.stompClient = Stomp.over(ws);
     const that = this;
-    // tslint:disable-next-line:only-arrow-functions
-    this.stompClient.connect({}, function(frame) {
+    this.stompClient.connect({}, (frame) => {
       that.stompClient.subscribe('/message', (message) => {
         if (message.body) {
           that.msg.push(message.body);
         }
       });
+      that.stompClient.subscribe(
+        `/user/${frame.headers['user-name']}/queue`,
+        (message) => {
+          if (message.body) {
+            that.msg.push(message.body);
+          }
+        }
+      );
     });
   }
 
   sendMessage(message) {
-    this.stompClient.send('/app/send/message' , {}, message);
+    this.stompClient.send('/app/send/message', {}, message);
+  }
+  sendMessageToUser(message) {
+    this.stompClient.send('/app/send/hello', {}, message);
   }
 }
