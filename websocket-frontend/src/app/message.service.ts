@@ -15,20 +15,17 @@ export class MessageService {
     const ws = new SockJS(serverUrl);
     this.stompClient = Stomp.over(ws);
     const that = this;
-    this.stompClient.connect({}, (frame) => {
+    this.stompClient.connect({}, (frame)=> {
       that.stompClient.subscribe('/message', (message) => {
         if (message.body) {
           that.msg.push(message.body);
         }
       });
-      that.stompClient.subscribe(
-        `/user/${frame.headers['user-name']}/queue`,
-        (message) => {
-          if (message.body) {
-            that.msg.push(message.body);
-          }
+      that.stompClient.subscribe(`/user/${frame.headers['user-name']}/queue`, (message) => {
+        if (message.body) {
+          that.msg.push(message.body);
         }
-      );
+      });
     });
   }
 
