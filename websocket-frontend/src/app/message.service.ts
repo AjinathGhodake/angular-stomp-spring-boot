@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 declare var SockJS;
 declare var Stomp;
 export enum MessageType {
@@ -23,7 +23,7 @@ export class ChatMessage implements IChatMessage {
   }
 }
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class MessageService {
   constructor() {
@@ -32,23 +32,34 @@ export class MessageService {
   public stompClient;
   public msg: ChatMessage[] = [];
   initializeWebSocketConnection() {
-    const serverUrl = 'http://localhost:8082/socket';
+    const serverUrl = "http://localhost:8082/socket";
     const ws = new SockJS(serverUrl);
     this.stompClient = Stomp.over(ws);
     const that = this;
     this.stompClient.connect({}, (frame) => {
-      that.stompClient.subscribe('/register', ({body}) => {
+      that.stompClient.subscribe("/register", ({ body }) => {
         that.msg.push(JSON.parse(body));
       });
-      that.stompClient.subscribe('/queue/public', ({body}) => {
+      that.stompClient.subscribe("/queue/public", ({ body }) => {
         that.msg.push(JSON.parse(body));
       });
+      that.stompClient.subscribe(
+        `/user/${frame.headers["user-name"]}/queue`,
+        (message) => {
+          if (message.body) {
+            that.msg.push(JSON.parse(message.body));
+          }
+        }
+      );
     });
   }
   addUser(message) {
-    this.stompClient.send('/app/chat.addUser', {}, JSON.stringify(message));
+    this.stompClient.send("/app/chat.addUser", {}, JSON.stringify(message));
   }
   sendMessage(message) {
-    this.stompClient.send('/app/send/hello', {}, JSON.stringify(message));
+    this.stompClient.send("/app/send", {}, JSON.stringify(message));
+  }
+  sendMessageToUser(message) {
+    this.stompClient.send("/app/send/user", {}, JSON.stringify(message));
   }
 }

@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -31,10 +32,15 @@ public class WebSocketController {
         return chatMessage;
     }
 
-    @MessageMapping("/send/hello")
+    @MessageMapping("/send")
     @SendTo("/queue/public")
-    public ChatMessage sendMessageToUser(@Payload ChatMessage chatMessage) {
+    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
         return chatMessage;
     }
 
+    @MessageMapping("/send/user")
+    @SendToUser("/queue")
+    public ChatMessage sendMessageToUser(@Payload ChatMessage chatMessage ,Principal user) {
+        return chatMessage;
+    }
 }

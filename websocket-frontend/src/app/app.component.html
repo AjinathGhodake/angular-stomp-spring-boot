@@ -18,6 +18,8 @@
     [(ngModel)]="input"
   />
   <button class="btn btn-success" (click)="sendMessage()">Send message</button>
+  <button class="btn btn-success" (click)="sendMessageToUser()">Send message To User</button>
+  
   <div class="content">
     <div *ngFor="let msg of messageService.msg">
       {{msg | json}}

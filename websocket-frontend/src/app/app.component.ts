@@ -32,4 +32,15 @@ export class AppComponent {
       this.messageService.addUser(chatMessage);
     }
   }
+  sendMessageToUser() {
+    if (this.input && this.user) {
+      const chatMessage: ChatMessage = {
+        sender: this.user,
+        content: this.input,
+        type: MessageType.CHAT,
+      };
+      this.messageService.sendMessageToUser(chatMessage);
+      this.input = "";
+    }
+  }
 }
