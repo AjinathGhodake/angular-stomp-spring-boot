@@ -6,16 +6,24 @@
   <input
     class="form-control"
     type="text"
-    placeholder="message"
+    placeholder="Enter user ...."
+    [(ngModel)]="user"
+  />
+  <button class="btn btn-success" (click)="addUser()">Connect User</button>
+
+  <input
+    class="form-control"
+    type="text"
+    placeholder="Enter Message ..."
     [(ngModel)]="input"
   />
-  <button class="btn btn-success" (click)="sendMessage()">Send</button>
-  <button class="btn btn-success" (click)="sendMessageToUser()">
-    Send to user
-  </button>
+  <button class="btn btn-success" (click)="sendMessage()">Send message</button>
   <div class="content">
     <div *ngFor="let msg of messageService.msg">
-      {{ msg }}
+      {{msg | json}}
+      <div>content: {{ msg?.content }}</div>
+      <div>sender: {{ msg?.sender }}</div>
+      <div>Type: {{ msg?.type }}</div>
     </div>
   </div>
 </div>

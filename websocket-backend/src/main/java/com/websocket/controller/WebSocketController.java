@@ -2,11 +2,14 @@ package com.websocket.controller;
 
 import java.security.Principal;
 
+import com.websocket.model.ChatMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -18,18 +21,20 @@ public class WebSocketController {
     WebSocketController(SimpMessagingTemplate template) {
         this.template = template;
     }
-
-    @MessageMapping("/send/message")
-    public void sendMessage(String message) {
-        System.out.println(message);
-        this.template.convertAndSend("/message", message);
+    @MessageMapping("/chat.addUser")
+    @SendTo("/queue/public")
+    public ChatMessage addUser(@Payload ChatMessage chatMessage, 
+                               SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in web socket session
+        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+        System.out.println(headerAccessor.getSessionAttributes());
+        return chatMessage;
     }
 
     @MessageMapping("/send/hello")
-    @SendToUser("/queue")
-    public String sendMessageToUser(@Payload String message, Principal user) {
-        System.out.println(message);
-        return message;
+    @SendTo("/queue/public")
+    public ChatMessage sendMessageToUser(@Payload ChatMessage chatMessage) {
+        return chatMessage;
     }
 
 }

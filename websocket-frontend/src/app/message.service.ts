@@ -1,6 +1,27 @@
 import { Injectable } from '@angular/core';
 declare var SockJS;
 declare var Stomp;
+export enum MessageType {
+  CHAT,
+  JOIN,
+  LEAVE,
+}
+
+export interface IChatMessage {
+  type: MessageType;
+  content: string;
+  sender: string;
+}
+export class ChatMessage implements IChatMessage {
+  type: MessageType;
+  content: string;
+  sender: string;
+  constructor(type: string, content: string, sender: string) {
+    this.type = MessageType.JOIN;
+    this.content = content;
+    this.sender = sender;
+  }
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -9,30 +30,25 @@ export class MessageService {
     this.initializeWebSocketConnection();
   }
   public stompClient;
-  public msg = [];
+  public msg: ChatMessage[] = [];
   initializeWebSocketConnection() {
     const serverUrl = 'http://localhost:8082/socket';
     const ws = new SockJS(serverUrl);
     this.stompClient = Stomp.over(ws);
     const that = this;
-    this.stompClient.connect({}, (frame)=> {
-      that.stompClient.subscribe('/message', (message) => {
-        if (message.body) {
-          that.msg.push(message.body);
-        }
+    this.stompClient.connect({}, (frame) => {
+      that.stompClient.subscribe('/register', ({body}) => {
+        that.msg.push(JSON.parse(body));
       });
-      that.stompClient.subscribe(`/user/${frame.headers['user-name']}/queue`, (message) => {
-        if (message.body) {
-          that.msg.push(message.body);
-        }
+      that.stompClient.subscribe('/queue/public', ({body}) => {
+        that.msg.push(JSON.parse(body));
       });
     });
   }
-
-  sendMessage(message) {
-    this.stompClient.send('/app/send/message', {}, message);
+  addUser(message) {
+    this.stompClient.send('/app/chat.addUser', {}, JSON.stringify(message));
   }
-  sendMessageToUser(message) {
-    this.stompClient.send('/app/send/hello', {}, message);
+  sendMessage(message) {
+    this.stompClient.send('/app/send/hello', {}, JSON.stringify(message));
   }
 }
